@@ -135,10 +135,12 @@ WHERE StudioName = 'Fox' AND Year = 1980
 #### 1.1.1 Projection of specific attributes
 ```sql
 SELECT Title, Year, Genre
+FROM Movie
 ```
 #### 1.1.2 Select all attributes
 ```sql
 SELECT *
+FROM Movie
 ```
 #### 1.1.3 Rename attributes
 ```sql
@@ -146,14 +148,16 @@ SELECT attrName_old AS attrName_new
 ```
 ```sql
 SELECT Title AS Name, Year AS Time
+FROM Movie
 ```
 Defined alias can be used in remaining request
 #### 1.1.4 Expressions
 ```sql
 SELECT Title, Length*0.016667 AS Hours
+FROM Movie
 ```
 
-## 1.2 Selection: WHERE clasue
+## 1.2 Selection: WHERE clause
 
 - Selection of output tuples
 - Comparison operators
@@ -165,9 +169,9 @@ SELECT Title, Length*0.016667 AS Hours
   - Brackets are allowed
     ```sql
     SELECT Title
-    FROM Movies
-    WHERE (Year > 1970 OR Length < 90)
-        AND StudioName = ’MGM’;
+    FROM Movie
+    WHERE (Year > 1980 OR Length > 200)
+        AND StudioName = 'Universal';
     ```
 - Comparisons can be made between constants, attributes and arithmetic expressions
 
@@ -205,8 +209,6 @@ WHERE Year BETWEEN 1980 AND 2000
 ```
 
 Alternative syntax using the concat() function
-
-⚠️ Does not work in this notebook
 
 ```sql
 SELECT concat(Title, ', ', Year) AS MovieInfo FROM Movie
@@ -397,7 +399,7 @@ ORDER BY COUNT(*) DESC
 
 ## Selection of groups: HAVING
 Restricting the result set after grouping with the HAVING-clause
-```
+```sql
 SELECT ...
 FROM ...
 [WHERE ...]
@@ -496,7 +498,7 @@ JOIN MovieCast ON Movie.Title = MovieCast.MovieTitle
 JOIN Actor ON MovieCast.ActorName = Actor.Name;
 ```
 
-### 3.2.2 LEFT OUTER JOIN
+### 3.2.2 OUTER JOINs
 Return **all movies**, even those with **no cast members**.
 
 ```sql
@@ -504,13 +506,14 @@ SELECT Movie.Title, MovieCast.ActorName
 FROM Movie
 LEFT JOIN MovieCast
 ON Movie.Title = MovieCast.MovieTitle AND Movie.Year = MovieCast.MovieYear;
+```
 
 Return all cast members, even for movies without infos.
 
 ```sql
 SELECT Movie.Title, MovieCast.ActorName
 FROM Movie
-LEFT JOIN MovieCast
+RIGHT JOIN MovieCast
 ON Movie.Title = MovieCast.MovieTitle AND Movie.Year = MovieCast.MovieYear;
 ```
 ⚠️ Does not work in this notebook
