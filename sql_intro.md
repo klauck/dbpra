@@ -1,4 +1,82 @@
-# Create a SQLite database, and load data¶
+Basic SQL commands.
+
+For testing, you can use, for example, https://sqlite.org/fiddle/index.html
+
+
+# Create tables and insert data¶
+
+## All Commands (for a quick setup)
+```sql
+CREATE TABLE IF NOT EXISTS Movie (
+  Title VARCHAR(30) NOT NULL,
+  Year INTEGER NOT NULL, 
+  Length INTEGER,
+  Color VARCHAR(5),
+  Genre VARCHAR(20),
+  StudioName VARCHAR(20),
+  ProducerID INTEGER,
+  PRIMARY KEY (Title, Year)
+);
+
+INSERT INTO Movie VALUES ('Star Wars', 1977, 124, 'TRUE', 'sciFi', 'Fox', 12345)
+, ('Star Wars 2', 1980, 124, 'TRUE', 'sciFi', 'Fox', 12345)
+, ('Rocky', 1985, 200, 'TRUE', 'action', 'Universal', 12125)
+, ('Rambo', 1978, 100, 'TRUE', 'action', 'Universal', 32355)
+, ('Galaxy Quest', 1999, 104, 'TRUE', 'comedy', 'DreamWorks', 67890)
+, ('Gone with the Wind', 1937, 238, 'TRUE', 'drama', 'Warner Bros', 10000)
+, ('Spiel mir das Lied vom Tod', 1968, 165, 'TRUE', 'western', 'Paramount', 10000)
+, ('Star Trek', 1979, NULL, 'TRUE', 'sciFi', 'Paramount', 10001);
+
+CREATE TABLE IF NOT EXISTS Actor (
+  Name VARCHAR(20) NOT NULL PRIMARY KEY,
+  Address VARCHAR(40),
+  Gender CHAR,
+  Birthdate DATE
+);
+
+INSERT INTO Actor VALUES ('Carrie Fisher', 'Hollywood', 'F', '1956-10-21')
+, ('Mark Hamill', '456 Oak Rd., Brentwood', 'M', '1951-09-25')
+, ('Harrison Ford', 'Beverly Hills', 'M', '1942-07-13')
+, ('Angelina Jolie', '123 Maple St., Hollywood', 'F', '1975-06-04')
+, ('Brad Pitt', '123 Maple St., Hollywood', 'M', '1963-12-18');
+
+CREATE TABLE IF NOT EXISTS MovieCast (
+  MovieTitle VARCHAR(30) NOT NULL,
+  MovieYear INTEGER NOT NULL,
+  ActorName VARCHAR(20) NOT NULL,
+  PRIMARY KEY (MovieTitle, MovieYear, ActorName)
+);
+
+INSERT INTO MovieCast VALUES ('Star Wars', 1977, 'Carrie Fisher')
+, ('Star Wars', 1977, 'Harrison Ford')
+, ('Star Wars', 1977, 'Mark Hamill')
+, ('Star Wars 2', 1980, 'Carrie Fisher')
+, ('Heroes', 1977, 'Harrison Ford');
+
+CREATE TABLE IF NOT EXISTS Producer (
+  Name VARCHAR(20),
+  Address VARCHAR(40),
+  Id INTEGER NOT NULL PRIMARY KEY,
+  Salary INTEGER
+);
+
+INSERT INTO Producer VALUES ('Stephen Spielberg', 'Hollywood', 9999, 1000000)
+, ('Gary Kurtz', NULL, 12345, NULL)
+, ('Brad Pitt', '123 Maple St., Hollywood', 10002, NULL);
+
+CREATE TABLE IF NOT EXISTS Studio (
+  Name VARCHAR(20) NOT NULL PRIMARY KEY,
+  Address VARCHAR(20),
+  PresidentId INTEGER
+);
+
+INSERT INTO Studio VALUES ('Fox', 'Los Angeles', 7777)
+, ('Universal', 'Universal City', 8888)
+, ('DreamWorks', 'Universal City', 9999);
+```
+
+
+## Individual Commands
 
 ```sql
 CREATE TABLE IF NOT EXISTS Movie (
@@ -92,7 +170,7 @@ INSERT INTO Studio VALUES ('Fox', 'Los Angeles', 7777)
 ## 1. Basic structure
 
 All SQL queries are structured as follows:
-```
+```sql
 SELECT <attribute_list>
 FROM <schema_list>
 WHERE <condition_list>;
@@ -113,7 +191,7 @@ WHERE <condition_list>;
 
 ```sql
 SELECT *
-FROM Movie
+FROM Movie;
 ```
 
 ### The tile and year of all movies from Fox:
@@ -127,7 +205,7 @@ WHERE StudioName = 'Fox';
 ```sql
 SELECT *
 FROM Movie
-WHERE StudioName = 'Fox' AND Year = 1980
+WHERE StudioName = 'Fox' AND Year = 1980;
 ```
 
 ## 1.1 Projection: SELECT clause
@@ -135,12 +213,12 @@ WHERE StudioName = 'Fox' AND Year = 1980
 #### 1.1.1 Projection of specific attributes
 ```sql
 SELECT Title, Year, Genre
-FROM Movie
+FROM Movie;
 ```
 #### 1.1.2 Select all attributes
 ```sql
 SELECT *
-FROM Movie
+FROM Movie;
 ```
 #### 1.1.3 Rename attributes
 ```sql
@@ -148,13 +226,13 @@ SELECT attrName_old AS attrName_new
 ```
 ```sql
 SELECT Title AS Name, Year AS Time
-FROM Movie
+FROM Movie;
 ```
 Defined alias can be used in remaining request
 #### 1.1.4 Expressions
 ```sql
 SELECT Title, Length*0.016667 AS Hours
-FROM Movie
+FROM Movie;
 ```
 
 ## 1.2 Selection: WHERE clause
@@ -179,12 +257,12 @@ FROM Movie
 
 ```sql
 SELECT * FROM Movie
-WHERE Year IN (1980, 1990, 2000)
+WHERE Year IN (1980, 1990, 2000);
 ```
 
 ```sql
 SELECT * FROM Movie
-WHERE Year BETWEEN 1980 AND 2000
+WHERE Year BETWEEN 1980 AND 2000;
 ```
 
 ## 1.3 Data Types
@@ -205,14 +283,14 @@ WHERE lower(Genre) = 'scifi' ;
 
 ```sql
 SELECT Title || ', ' || Year AS MovieInfo FROM Movie
-WHERE Year BETWEEN 1980 AND 2000
+WHERE Year BETWEEN 1980 AND 2000;
 ```
 
 Alternative syntax using the concat() function
 
 ```sql
 SELECT concat(Title, ', ', Year) AS MovieInfo FROM Movie
-WHERE Year BETWEEN 1980 AND 2000
+WHERE Year BETWEEN 1980 AND 2000;
 ```
 
 ### Pattern Matching Using LIKE
@@ -225,7 +303,7 @@ WHERE Year BETWEEN 1980 AND 2000
 ```sql
 SELECT Title
 FROM Movie
-WHERE Title LIKE 'S%'
+WHERE Title LIKE 'S%';
 ```
 
 ## 1.3.2 Date and Time
@@ -235,7 +313,7 @@ Supported functionality (e.g., data types, time zone support, functions) depends
 ```sql
 SELECT datetime('now', 'localtime')
 FROM Movie
-LIMIT 1
+LIMIT 1;
 ```
 
 ## 1.4 Unknown Values: NULL
@@ -261,7 +339,7 @@ INSERT INTO Person VALUES('Sarah', 1986)
 ```sql
 SELECT *
 FROM Person
-WHERE BirthYear >= 1986 OR BirthYear < 1986
+WHERE BirthYear >= 1986 OR BirthYear < 1986;
 ```
 
 ### Truth table for three-valued logic with UNKNOWN
@@ -284,7 +362,7 @@ WHERE BirthYear >= 1986 OR BirthYear < 1986
 ```sql
 SELECT *
 FROM Person
-WHERE BirthYear IS NULL
+WHERE BirthYear IS NULL;
 ```
 
 ## 1.5 Sorting: ORDER BY
@@ -295,7 +373,7 @@ WHERE BirthYear IS NULL
 - Examples:
   - ```sql
       SELECT * FROM Movie
-      ORDER BY Length , Title
+      ORDER BY Length , Title;
     ```
   - ```sql
       SELECT * FROM Movie
@@ -304,7 +382,7 @@ WHERE BirthYear IS NULL
 
 ```sql
 SELECT * FROM Movie
-ORDER BY Length DESC, Title ASC
+ORDER BY Length DESC, Title ASC;
 ```
 
 ## 1.6 Duplicate Elimination: DISTINCT
@@ -318,7 +396,7 @@ ORDER BY Length DESC, Title ASC
 - Example: Return all studio names contained in the Movies table exactly once:
 ```sql
 SELECT DISTINCT(StudioName)
-FROM Movie
+FROM Movie;
 ```
 
 ## 1.7 Aggregations
@@ -356,12 +434,12 @@ INSERT INTO Person VALUES('Sarah', 1986)
 
 ```sql
 SELECT COUNT(*)
-FROM Person
+FROM Person;
 ```
 
 ```sql
 SELECT COUNT(BirthYear)
-FROM Person
+FROM Person;
 ```
 
 
@@ -371,7 +449,7 @@ FROM Person
 ```sql
 SELECT StudioName, COUNT(*) FROM Movie
 GROUP BY StudioName
-ORDER BY COUNT(*) DESC
+ORDER BY COUNT(*) DESC;
 ```
 
 Note: **SELECT**-clause in queries with **GROUP BY** must only contain attributes that are either:
@@ -382,10 +460,10 @@ SQLite is an exception
 ```sql
 SELECT COUNT(*) FROM Movie
 GROUP BY StudioName
-ORDER BY COUNT(*) DESC
+ORDER BY COUNT(*) DESC;
 ```
 
-⚠️ SQLite will NOT throw an error. Instead, it uses a non-standard rule:
+⚠️ For the next query, SQLite will NOT throw an error. Instead, it uses a non-standard rule:
 - You may select columns that are not in the GROUP BY
 - SQLite will then return an arbitrary value for those columns — usually from one of the rows in the group, but it is not guaranteed which one
 
@@ -394,7 +472,7 @@ The same query will fail in other systems.
 ```sql
 SELECT Genre, Year, COUNT(*) FROM Movie
 GROUP BY StudioName
-ORDER BY COUNT(*) DESC
+ORDER BY COUNT(*) DESC;
 ```
 
 ## Selection of groups: HAVING
@@ -410,7 +488,7 @@ HAVING <cond>;
 ```sql
 SELECT StudioName, COUNT(*) FROM Movie
 GROUP BY StudioName
-HAVING COUNT(*) > 1
+HAVING COUNT(*) > 1;
 ```
 
 # 2 Database Modifications
@@ -419,6 +497,11 @@ We can insert complete tuples or specify only selected attributes.
 ```sql
 INSERT INTO Actor (Name, Address, Gender, Birthdate)
 VALUES ('Tom Hanks', 'Los Angeles', 'M', '1956-07-09');
+```
+
+```sql
+INSERT INTO Actor (Name, Gender, Birthdate)
+VALUES ('Heike Makatsch', 'F', '1971-08-13');
 ```
 
 ```sql
@@ -440,7 +523,7 @@ SELECT * FROM Actor;
 ⚠️ Without a WHERE clause, ALL rows are deleted.
 
 ```sql
-DELETE FROM Actor
+DELETE FROM Actor;
 ```
 
 ## 2.3 Updates: UPDATE
@@ -516,7 +599,6 @@ FROM Movie
 RIGHT JOIN MovieCast
 ON Movie.Title = MovieCast.MovieTitle AND Movie.Year = MovieCast.MovieYear;
 ```
-⚠️ Does not work in this notebook
 
 Return all movies and all cast members.
     
