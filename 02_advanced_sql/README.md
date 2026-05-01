@@ -90,3 +90,138 @@ Open a shell in the container, e.g., for inspecting the created files by Postgre
 ```
 docker exec -it demo_postgres bash
 ```
+
+
+
+# Constraints
+
+```sql
+CREATE TABLE customer(
+    id BIGINT PRIMARY KEY,
+    name TEXT NOT NULL,
+    address TEXT NOT NULL,
+    email TEXT UNIQUE NOT NULL CHECK(email LIKE '%@%'),
+    phone TEXT);
+
+CREATE TABLE "order"(
+    id BIGINT PRIMARY KEY,
+    date TIMESTAMP WITH TIME ZONE NOT NULL,
+    price DECIMAL(20,2) NOT NULL,
+    customer_id BIGINTREFERENCES customer(id) ON DELETE CASCADE);
+```
+
+```sql
+INSERT INTO customer VALUES(1, 'Sarah', 'TU Berlin', 'sarah@tu-berlin.de', NULL);
+```
+
+```sql
+INSERT INTO "order" VALUES(1, CURRENT_TIMESTAMP, '3.14', 1);
+```
+
+```sql
+DELETE FROM customer WHERE id=1;
+```
+
+
+# Table Expressions
+
+```sql
+CREATE TABLE customer(
+    id BIGINT PRIMARY KEY,
+    name TEXT NOT NULL,
+    address TEXT NOT NULL,
+    email TEXT UNIQUE NOT NULL CHECK(email LIKE '%@%'),
+    phone TEXT);
+
+CREATE TABLE "order"(
+    id BIGINT PRIMARY KEY,
+    date TIMESTAMP WITH TIME ZONE NOT NULL,
+    price DECIMAL(20,2) NOT NULL,
+    customer_id BIGINTREFERENCES customer(id) ON DELETE CASCADE);
+
+INSERT INTO customer VALUES(1, 'Sarah', 'TU Berlin', 'sarah@tu-berlin.de', NULL);
+INSERT INTO customer VALUES(2, 'Jin', 'HPI', 'jin@hpi.de', NULL);
+INSERT INTO customer VALUES(3, 'Fynn', 'Finland', 'fynn@finland.fi', NULL);
+INSERT INTO customer VALUES(4, 'Mika', 'BTU', 'mika@btu.de', NULL);
+
+INSERT INTO "order" VALUES(1, CURRENT_TIMESTAMP, '3.14', 1);
+INSERT INTO "order" VALUES(2, CURRENT_TIMESTAMP, '41.00', 1);
+INSERT INTO "order" VALUES(3, CURRENT_TIMESTAMP, '42.14', 2);
+INSERT INTO "order" VALUES(4, CURRENT_TIMESTAMP, '0.81', 3);
+INSERT INTO "order" VALUES(5, CURRENT_TIMESTAMP, '17.11', 3);
+INSERT INTO "order" VALUES(5, CURRENT_TIMESTAMP, '23.00', 3);
+```
+
+
+### Finds the customer(s) who have spent the most money in total across all their orders, and then returns all orders belonging to that customer (or those customers).
+
+
+## Subqueries
+
+```sql
+SELECT *
+FROM   customer
+       JOIN "order"
+       ON customer.id = "order".customer_id
+WHERE  customer.id = (SELECT customer_id
+                      FROM   (SELECT   customer.id AS customer_id,
+                                       Sum(price)  AS order_volumne
+                              FROM     customer
+                                       JOIN "order"
+                                       ON customer.id = "order".customer_id
+                              GROUP BY customer.id) customer_order_volumne
+                      WHERE  order_volumne = (SELECT Max(order_volumne)
+                                              FROM   (SELECT   customer.id AS customer_id,
+                                                               Sum(price)  AS order_volumne
+                                                      FROM     customer
+                                                               JOIN "order"
+                                                               ON customer.id = "order".customer_id
+                                                      GROUP BY customer.id)));
+
+```
+
+## Views
+
+```sql
+CREATE VIEW customer_order_volume
+     AS (SELECT   customer.id AS customer_id,
+                  Sum(price)  AS order_volume
+         FROM     customer
+                  JOIN "order"
+                  ON customer.id = "order".customer_id
+         GROUP BY customer.id);
+
+  SELECT *
+  FROM   customer
+         JOIN "order"
+         ON customer.id = "order".customer_id
+  WHERE  customer.id = (SELECT customer_id
+                        FROM   customer_order_volume
+                        WHERE  order_volume = (SELECT Max(order_volume)
+                                               FROM   customer_order_volume));
+
+```
+
+
+## Common Table Expressions (CTEs)
+
+```sql
+WITH customer_order_volume
+     AS (SELECT   customer.id AS customer_id,
+                  Sum(price)  AS order_volume
+         FROM     customer
+                  JOIN "order"
+                  ON customer.id = "order".customer_id
+         GROUP BY customer.id) 
+  SELECT *
+  FROM   customer
+         JOIN "order"
+         ON customer.id = "order".customer_id
+  WHERE  customer.id = (SELECT customer_id
+                        FROM   customer_order_volume
+                        WHERE  order_volume = (SELECT Max(order_volume)
+                                               FROM   customer_order_volume));
+```
+
+
+
