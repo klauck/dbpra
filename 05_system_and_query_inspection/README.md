@@ -26,3 +26,62 @@ CREATE VIEW SciFiMovie AS
   FROM Movie
   WHERE Genre = 'sciFi';
 ```
+
+
+# PostgreSQL Examples
+
+## Schema Inspection
+
+```sql
+SELECT schemaname, tablename
+FROM pg_catalog.pg_tables
+WHERE schemaname NOT IN ('pg_catalog', 'information_schema')
+ORDER BY schemaname, tablename;
+```
+
+```sql
+SELECT table_schema, table_name
+FROM information_schema.tables
+WHERE table_type = 'BASE TABLE'
+    AND table_schema NOT IN ('pg_catalog', 'information_schema')
+ORDER BY table_schema, table_name;
+```
+
+
+
+
+
+## Query Inspection
+
+1. Query Planning
+   Shows:
+   - Planned execution plan/tree
+   - Estimated cardinalities
+   - Estimated costs (internal metric)
+
+```sql
+EXPLAIN SELECT *
+FROM orders
+WHERE o_totalprice < 1000
+ORDER BY o_orderkey;
+```
+
+```sql
+EXPLAIN SELECT *
+FROM orders
+WHERE o_orderkey = 42;
+```
+
+2. Query Execution
+   Shows:
+   - Actual cardinalities
+   - Execution time
+   - Buffer and memory usage
+
+
+```sql
+EXPLAIN (ANALYZE, BUFFERS) SELECT *
+FROM orders
+WHERE o_totalprice < 1000
+ORDER BY o_orderkey;
+```
