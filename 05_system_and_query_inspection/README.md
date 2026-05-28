@@ -7,3 +7,22 @@ The database can be used to inspect:
 - existing indexes
 - existing views
 - database settings and configuration settings (enabled features, logging, page size, ...)
+
+## Manual Setup
+
+The database was populated using the following commands: https://github.com/klauck/dbpra/blob/main/sql_intro.md#all-commands-for-a-quick-setup
+
+The index and view were created with these SQL statements:
+
+```sql
+CREATE INDEX index_actor_birthdate ON "Actor" (
+   "Birthdate" ASC
+);
+```
+
+```sql
+CREATE VIEW SciFiMovies AS
+  SELECT Title, Year
+  FROM Movie
+  WHERE Genre = 'sciFi';
+```
