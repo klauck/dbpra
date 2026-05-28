@@ -21,7 +21,7 @@ CREATE INDEX index_actor_birthdate ON "Actor" (
 ```
 
 ```sql
-CREATE VIEW SciFiMovies AS
+CREATE VIEW SciFiMovie AS
   SELECT Title, Year
   FROM Movie
   WHERE Genre = 'sciFi';
