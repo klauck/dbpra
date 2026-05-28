@@ -32,12 +32,16 @@ CREATE VIEW SciFiMovie AS
 
 ## Schema Inspection
 
+1. Using PostgreSQL-specific Tables/Views
+
 ```sql
 SELECT schemaname, tablename
 FROM pg_catalog.pg_tables
 WHERE schemaname NOT IN ('pg_catalog', 'information_schema')
 ORDER BY schemaname, tablename;
 ```
+
+2. Using The Information Schema (defined by the SQL standard)
 
 ```sql
 SELECT table_schema, table_name
